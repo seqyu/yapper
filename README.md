@@ -1,2 +1,2 @@
 # yapper
-An online chatting thingy made with Flask (Hosting an instance in this repo!)
+An online chatting thingy made with Flask
