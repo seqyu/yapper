@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>yapper - main</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+</head>
+<body>
+    <!-- Username Modal -->
+    <div id="usernameModal" class="modal">
+        <div class="modal-content">
+            <h2>Welcome to yapper! To begin, please choose a username.
+            </h2>
+            <input type="text" id="usernameInput" placeholder="Enter your username" required>
+            <button id="saveUsername">Save</button>
+            <p>yapper 1.0</p>
+            <h3>Rules</h3>
+            <p>Don't be an asshole</p>
+            <p>Post legal stuff only, this aint 4chan</p>
+            <p>Follow the rules and the law</p>
+        </div>
+    </div>
+    {% if announcement %}
+    <div class="announcement-banner">
+        <p>{{ announcement }}</p>
+    </div>
+    {% endif %}
+
+    <div class="container" id="mainContent" style="display:none;">
+        <img src="{{ url_for('static', filename='logo.png') }}", height="50px", height="600">
+        <p>Main yapper instance</p>
+        <p>Contact @avrgfrnchguy on Discord to ask for any problematic message to be removed</p>
+        <form id="postForm">
+            <textarea name="content" id="content" placeholder="Write your message..." required></textarea>
+            <button type="submit">Post</button>
+        </form>
+        
+        <hr>
+        
+        <h2>Messages:</h2>
+        <div id="posts">
+            {% for username, content, timestamp in posts %}
+                <div class="post">
+                    <p><strong>{{ username }}</strong>: {{ content }}</p>
+                    <span class="timestamp">{{ timestamp }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        <a>yapper doesn't store any data. (besides the public messages obviously)</a>
+    </div>
+
+    <script>
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var username = null;
+
+        // Show the username modal
+        document.getElementById('saveUsername').onclick = function() {
+            var input = document.getElementById('usernameInput').value;
+            if (input.trim()) {
+                username = input.trim();  // Store the username
+                document.getElementById('usernameModal').style.display = 'none';  // Hide modal
+                document.getElementById('mainContent').style.display = 'block';  // Show main content
+            }
+        };
+
+        // Form submission
+        document.getElementById('postForm').onsubmit = function(e) {
+            e.preventDefault();
+            var content = document.getElementById('content').value;
+            if (content.trim() && username) {
+                socket.emit('new_post', { 'username': username, 'content': content });
+                document.getElementById('content').value = '';  // Clear the textarea after submitting
+            } else if (!username) {
+                alert('Please choose a username first!');
+            }
+        };
+
+        // Listen for new posts from the server
+        socket.on('broadcast_post', function(data) {
+            var postDiv = document.createElement('div');
+            postDiv.classList.add('post');
+            postDiv.innerHTML = '<p><strong>' + data.username + '</strong>: ' + data.content + '</p><span class="timestamp">Just now</span>';
+            document.getElementById('posts').prepend(postDiv);
+        });
+    </script>
+
+    <style>
+        .announcement-banner {
+            background-color: #ffcc00;
+            color: #333;
+            padding: 10px;
+            text-align: center;
+            font-weight: bold;
+        }
+        /* Simple modal styling */
+        .modal {
+            display: block; /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            margin: auto;
+            width: 300px;
+        }
+
+        #usernameInput {
+            padding: 10px;
+            font-size: 16px;
+            width: 80%;
+            margin-bottom: 10px;
+        }
+
+        #saveUsername {
+            padding: 10px 20px;
+            background-color: #9C6DFF;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #saveUsername:hover {
+            padding: 10px 20px;
+            background-color: #af8aff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</body>
+</html>
