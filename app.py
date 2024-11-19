@@ -33,14 +33,28 @@ def get_announcement():
     except FileNotFoundError:
         return ''  # Return empty string if no announcement file is found
 
+def get_ver():
+    try:
+        with open('version', 'r') as file:
+            return file.read().strip()  # Remove extra whitespace
+    except FileNotFoundError:
+        return ''  # Return empty string if no announcement file is found
+def get_rules():
+    try:
+        with open('rules', 'r') as file:
+            return file.read().strip()  # Remove extra whitespace
+    except FileNotFoundError:
+        return 'ANARCHY MODE!\nThis server has no rules! Just remember to follow the law!'  # Return empty string if no announcement file is found
 @app.route('/')
 def index():
     announcement = get_announcement()  # Get the announcement content
+    version = get_ver()
+    rules = get_rules()
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT username, content, timestamp FROM posts ORDER BY timestamp DESC')
         posts = cursor.fetchall()
-    return render_template('index.html', posts=posts, announcement=announcement)
+    return render_template('index.html', posts=posts, announcement=announcement, version=version, rules=rules)
 
 @socketio.on('new_post')
 def handle_new_post(data):
