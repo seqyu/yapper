@@ -122,6 +122,8 @@ def start_app():
     print(f"Welcome to {get_ver()}!")
     print("Message Of The Day:")
     print(get_motd())
+    print("Server name:")
+    print(get_name())
 if __name__ == '__main__':
     start_app()
     socketio.run(app, debug=True, use_reloader=False)
