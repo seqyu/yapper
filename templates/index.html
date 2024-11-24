@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>yapper</title>
+    <title>yapper - main</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
 </head>
@@ -15,30 +15,28 @@
             </h2>
             <input type="text" id="usernameInput" placeholder="Enter your username" required>
             <button id="saveUsername">Save</button>
-            <p>yapper 1.0</p>
-            <h3>Rules</h3>
-            <p>Don't be an asshole</p>
-            <p>Post legal stuff only, this aint 4chan</p>
-            <p>Follow the rules and the law</p>
+            <p>Instance is running {{ version }}</p>
+            <h3>Server Rules</h3>
+            <p>{{ rules }}</p>
         </div>
     </div>
-    {% if announcement %}
+    {% if motd %}
     <div class="announcement-banner">
-        <p>{{ announcement }}</p>
+        <p>{{ motd }}</p>
     </div>
     {% endif %}
 
     <div class="container" id="mainContent" style="display:none;">
         <img src="{{ url_for('static', filename='logo.png') }}", height="50px", height="600">
-        <p>Contact @avrgfrnchguy on Discord to ask for any problematic message to be removed</p>
+        <h1>{{ name }}</h1>
         <form id="postForm">
-            <textarea name="content" id="content" placeholder="Write your message..." required></textarea>
+            <textarea name="content" id="content" placeholder="What are you going to yap about today?" required></textarea>
             <button type="submit">Post</button>
         </form>
         
         <hr>
         
-        <h2>Messages:</h2>
+        <h2>Pavés:</h2>
         <div id="posts">
             {% for username, content, timestamp in posts %}
                 <div class="post">
@@ -47,7 +45,6 @@
                 </div>
             {% endfor %}
         </div>
-        <a>yapper doesn't store any data. (besides the public messages obviously)</a>
     </div>
 
     <script>
