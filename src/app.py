@@ -144,4 +144,4 @@ def start_app():
 
 if __name__ == '__main__':
     start_app()
-    socketio.run(app, debug=True, use_reloader=False)
+    socketio.run(app, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)
