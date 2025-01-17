@@ -3,7 +3,7 @@ WORKDIR /usr/local/yapper
 
 # Install the application dependencies
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r --break-system-packages requirements.txt
 
 # Copy in the source code
 COPY src/* ./
