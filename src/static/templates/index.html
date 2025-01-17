@@ -3,16 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>yapper - main</title>
+    <title>{{name}}</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.0/socket.io.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
 </head>
 <body>
+    <script>
+        var socket = io.connect();
+    
+        // Listen for the online count event
+        socket.on('online_count', function(data) {
+            const ppl = data.count / 2;
+            document.getElementById('online').textContent = 'Online: ' + ppl;
+        });
+    </script>
     <!-- Username Modal -->
     <div id="usernameModal" class="modal">
         <div class="modal-content">
-            <h2>Welcome to yapper! To begin, please choose a username.
-            </h2>
+            <h2>{{name}}</h2>
+            <p id="online">Online: 0</p>
             <input type="text" id="usernameInput" placeholder="Enter your username" required>
             <button id="saveUsername">Save</button>
             <p>Instance is running {{ version }}</p>
