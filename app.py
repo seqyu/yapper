@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO, emit, disconnect
 import sqlite3
 import os
 import threading
@@ -13,6 +13,9 @@ DATABASE = 'yapper.db'
 blocked_usernames = ['Bot']
 reset_thread_started = False  # Track if the reset thread has been started
 reset_interval = None  # Global variable to store reset interval
+
+# Track active users by their session ID
+active_users = set()
 
 def init_db():
     if not os.path.exists(DATABASE):
@@ -52,7 +55,8 @@ def get_name():
         with open('name', 'r') as file:
             return file.read().strip()
     except FileNotFoundError:
-        return 'yapper instance'
+        return 'A yapper instance'
+        
 def get_rules():
     try:
         with open('rules', 'r') as file:
@@ -69,7 +73,7 @@ def load_reset_interval():
             print(f"This instance will delete the pavés every {reset_interval // 3600} hours.")
     except (FileNotFoundError, ValueError):
         reset_interval = 24 * 3600  # Default to 24 hours
-        print("resettime.txt not found or invalid. This instance will delete the pavés every 24 hours.")
+        print("resettime.txt not found or invalid. This instance will clear the database every 24 hours.")
 
 def database_reset_thread():
     global reset_thread_started
@@ -113,6 +117,19 @@ def handle_new_post(data):
             conn.commit()
         emit('broadcast_post', {'username': username, 'content': content}, broadcast=True)
 
+@socketio.on('connect')
+def handle_connect():
+    # Add the user to the active_users set when they connect
+    active_users.add(request.sid)
+    emit('online_count', {'count': len(active_users)}, broadcast=True)
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    # Remove the user from the active_users set when they disconnect
+    if request.sid in active_users:
+        active_users.remove(request.sid)
+    emit('online_count', {'count': len(active_users)}, broadcast=True)
+
 def start_app():
     init_db()
     load_reset_interval()  # Load reset interval once
@@ -124,6 +141,7 @@ def start_app():
     print(get_motd())
     print("Server name:")
     print(get_name())
+
 if __name__ == '__main__':
     start_app()
     socketio.run(app, debug=True, use_reloader=False)
