@@ -3,3 +3,5 @@
 ### Running yapper
 
 `python app.py`
+
+### instructions on how you can configure everything is in the wiki tab
