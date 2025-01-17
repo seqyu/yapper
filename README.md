@@ -5,3 +5,6 @@
 `python app.py`
 
 ### instructions on how you can configure everything is in the wiki tab
+
+### Now on DockerHub.
+https://hub.docker.com/r/seqyu/yapper/tags
