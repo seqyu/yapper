@@ -8,5 +8,3 @@
 
 ### Now on DockerHub.
 https://hub.docker.com/r/seqyu/yapper/tags
-
-default port: 0471 
