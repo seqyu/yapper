@@ -7,4 +7,4 @@
 ### instructions on how you can configure everything is in the wiki tab
 
 ### Now on DockerHub.
-https://hub.docker.com/r/seqyu/yapper/tags
+docker run --name yapper -p 5050:5050 seqyu/yapper:latest
