@@ -86,14 +86,27 @@
         socket.on('broadcast_post', function(data) {
             var postDiv = document.createElement('div');
             postDiv.classList.add('post');
-            postDiv.innerHTML = '<p><strong>' + data.username + '</strong>: ' + data.content + '</p><span class="timestamp">Just now</span>';
+
+            var p = document.createElement('p');
+            var strong = document.createElement('strong');
+            strong.textContent = data.username;
+            p.appendChild(strong);
+            p.appendChild(document.createTextNode(': ' + data.content));
+
+            var timestamp = document.createElement('span');
+            timestamp.classList.add('timestamp');
+            timestamp.textContent = 'During this session';
+
+            postDiv.appendChild(p);
+            postDiv.appendChild(timestamp);
+
             document.getElementById('posts').prepend(postDiv);
         });
     </script>
 
     <style>
         .announcement-banner {
-            background-color: #ffcc00;
+            background-color: #8539ff;
             color: #333;
             padding: 10px;
             text-align: center;
