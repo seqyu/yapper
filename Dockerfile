@@ -10,4 +10,4 @@ COPY /src/ ./
 
 EXPOSE 5050
 
-CMD ["python", "src/app.py"]
+CMD ["python", "app.py"]
