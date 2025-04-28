@@ -1,2 +1,5 @@
 /src/yapper.db
 /src/__pycache__/*
+/src/name
+/src/motd.txt
+/src/rules
