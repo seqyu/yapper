@@ -15,7 +15,7 @@
 
     // Listen for the online count event
     socket.on('online_count', function (data) {
-      const ppl = data.count / 2; // divides the number of online people by 2 to get the correct number
+      const ppl = data.count; // divides the number of online people by 2 to get the correct number
       document.getElementById('onlineModal').textContent = 'Online: ' + ppl;
       document.getElementById('onlineHeader').textContent = 'Online: ' + ppl;
     });
