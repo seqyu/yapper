@@ -79,13 +79,25 @@ def database_reset_thread():
         reset_database()
         print("Database reset triggered.")
 
+@app.route('/old')
+def indexold():
+    with sqlite3.connect(DATABASE) as conn:
+        cursor = conn.cursor()
+        cursor.execute('SELECT username, content, timestamp FROM posts ORDER BY timestamp DESC')
+        posts = cursor.fetchall()
+    return render_template('index.html', posts=posts,
+                           motd=config.get('motd', ''),
+                           version=config.get('version', 'NaN'),
+                           rules=config.get('rules', ''),
+                           name=config.get('name', 'A yapper instance'))
+
 @app.route('/')
 def index():
     with sqlite3.connect(DATABASE) as conn:
         cursor = conn.cursor()
         cursor.execute('SELECT username, content, timestamp FROM posts ORDER BY timestamp DESC')
         posts = cursor.fetchall()
-    return render_template('index.html', posts=posts,
+    return render_template('indexnew.html', posts=posts,
                            motd=config.get('motd', ''),
                            version=config.get('version', 'NaN'),
                            rules=config.get('rules', ''),

@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- Thanks to scovings for the new index.html and style.css!-->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='stylenew.css') }}">
+  <title>{{ name }}</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.4.1/socket.io.js"></script>
+</head>
+
+<body>
+    <script>
+        var socket = io.connect();
+    
+        // Listen for the online count event
+        socket.on('online_count', function(data) {
+            const ppl = data.count / 2; // divides the number of online people by 2 to get the correct number
+            document.getElementById('onlineModal').textContent = 'Online: ' + ppl;
+            document.getElementById('onlineHeader').textContent = 'Online: ' + ppl;
+        });
+    </script>
+    <!-- USERNAME SELECTION AREA BEGINS -->
+    <div id="usernameModal">
+      <div class="modal-content">
+        <div class="logo">{{ name }}</div>
+        <h3>{{ motd }}</h3>
+        <p id="onlineModal">Online: NaN</p>
+        <p>Instance is running {{ version }}</p>
+        
+        <input type="text" id="usernameInput" placeholder="Please enter a username" required>
+        <button id="saveUsername">Save</button>
+    
+        <div class="rules">
+          <h3>Server Rules</h3>
+          <p>{{ rules }}</p>
+        </div>
+      </div>
+    </div>
+    
+    
+    <!-- CHAT AREA BEGINS -->
+  <div class="app-container">
+    <div class="header">
+      <div class="logo">{{ name }}</div>
+    </div>
+    <div class="header2">
+      <h3>{{ motd }}</h3>
+      <p id="onlineHeader">Online: NaN</p>
+    </div>
+
+    <div class="chat-area" id="chatArea">
+      {% for username, content, timestamp in posts %}
+      <div class="message received">
+        <div class="messsage-content">
+          <div class="message-bubble">
+            {{ content }}
+          </div>
+          <div class="message-info">
+            {{ username }} • {{ timestamp }}
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    <div id="mainContent" style="display: none;">
+    <div class="chat-input">
+      <form id="postForm">
+        <input type="text" placeholder="Yap a pavé..." id="content" name="content">
+        <button id="sendButton" type="submit">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round"
+              stroke-linejoin="round" />
+          </svg>
+        </button>
+      </form>
+    </div>
+  </div>
+  </div>
+
+  <script>
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    var username = null;
+
+    // Show the username modal
+    document.getElementById('saveUsername').onclick = function() {
+        var input = document.getElementById('usernameInput').value;
+        if (input.trim()) {
+            username = input.trim();  // Store the username
+            document.getElementById('usernameModal').style.display = 'none';  // Hide modal
+            document.getElementById('mainContent').style.display = 'block';
+          }
+    };
+
+    // Form submission
+    document.getElementById('postForm').onsubmit = function(e) {
+        e.preventDefault();
+        var content = document.getElementById('content').value;
+        if (content.trim() && username) {
+            console.log("sending:", username, content)
+            socket.emit('new_post', { 'username': username, 'content': content });
+            document.getElementById('content').value = '';  // Clear the textarea after submitting
+        } else if (!username) {
+            alert('Please choose a username first!');
+        }
+    };
+
+    // Listen for new posts from the server
+    socket.on('broadcast_post', function(data) {
+      const message = document.createElement('div');
+      message.className = 'message received';
+
+      const contentWrapper = document.createElement('div');
+      contentWrapper.className = 'message-content';
+
+      const bubble = document.createElement('div');
+      bubble.className = 'message-bubble';
+      bubble.textContent = data.content;
+
+      const info = document.createElement('div');
+      info.className = 'message-info';
+      info.textContent = `${data.username} • just now`;
+
+      contentWrapper.appendChild(bubble);
+      contentWrapper.appendChild(info);
+      message.appendChild(contentWrapper);
+
+      document.getElementById('chatArea').appendChild(message);
+      document.getElementById('chatArea').scrollTop = document.getElementById('chatArea').scrollHeight;
+});
+
+</script>
+</body>
+
+</html>
